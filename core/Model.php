@@ -89,85 +89,20 @@ class Model
         return self::$_db;
     }
 
-    public static function forTable($table, $pkey = null)
+    public function where($key, $op, $value = null)
     {
-        $orm = new self();
-        $orm->_table = self::table();
-        $orm->_primaryKey = $pkey ?: self::pkey();
-        return $orm;
-    }
-
-    public function where($key, $value)
-    {
-        return $this->whereEqual($key, $value);
-    }
-
-    public function whereEqual($key, $value)
-    {
-        return $this->_whereRaw($key, '=?', array($value));
-    }
-
-    public function whereNotEqual($key, $value)
-    {
-        return $this->_whereRaw($key, ' <> ?', array($value));
-    }
-
-    public function whereLike($key, $value)
-    {
-        return $this->_whereRaw($key, ' LIKE ?', array($value));
-    }
-
-    public function whereNotLike($key, $value)
-    {
-        return $this->_whereRaw($key, ' NOT LIKE ?', array($value));
-    }
-
-    public function whereLt($key, $value)
-    {
-        return $this->_whereRaw($key, ' < ?', array($value));
-    }
-
-    public function whereLte($key, $value)
-    {
-        return $this->_whereRaw($key, ' <= ?', array($value));
-    }
-
-    public function whereGt($key, $value)
-    {
-        return $this->_whereRaw($key, ' > ?', array($value));
-    }
-
-    public function whereGte($key, $value)
-    {
-        return $this->_whereRaw($key, ' >= ?', array($value));
-    }
-
-    public function whereId($id)
-    {
-        return $this->_whereRaw($this->_primaryKey, '=?', array($id));
-    }
-
-    public function whereIn($key, $values)
-    {
-        return $this->_whereIn($key, $values, true);
-    }
-
-    public function whereNotIn($key, $values)
-    {
-        return $this->_whereIn($key, $values, false);
-    }
-
-    private function _whereIn($key, $values, $is)
-    {
-        $ps = array_map(function ($v) { return '?'; }, $values);
-        $str = ($is ? ' ' : ' NOT ').'IN ('.implode(',', $qs).')';
-        return $this->_whereRaw($key, $str, $values);
-    }
-
-    private function _whereRaw($key, $midExpr, $values)
-    {
+        if ($value === null) {
+            return $this->where($key, '=', $op);
+        }
         $key = self::_backQuote($key);
-        return $this->whereRaw($key.$midExpr, $values);
+        if ($value instanceof Expression) {
+            $expr = "$keys $op ".$value->sql();
+            $values = $value->values();
+        } else {
+            $expr = "$keys $op ?";
+            $values = array($value);
+        }
+        return $this->whereRaw($expr, $values);
     }
 
     public static function _backQuote($key)
@@ -194,77 +129,20 @@ class Model
         return $this;
     }
 
-    public function having($key, $value)
+    public function having($key, $op, $value = null)
     {
-        return $this->havingEqual($key, $value);
-    }
-
-    public function havingEqual($key, $value)
-    {
-        return $this->_havingRaw($key, '=?', array($value));
-    }
-
-    public function havingNotEqual($key, $value)
-    {
-        return $this->_havingRaw($key, ' <> ?', array($value));
-    }
-
-    public function havingLike($key, $value)
-    {
-        return $this->_havingRaw($key, ' LIKE ?', array($value));
-    }
-
-    public function havingNotLike($key, $value)
-    {
-        return $this->_havingRaw($key, ' NOT LIKE ?', array($value));
-    }
-
-    public function havingLt($key, $value)
-    {
-        return $this->_havingRaw($key, ' < ?', array($value));
-    }
-
-    public function havingLte($key, $value)
-    {
-        return $this->_havingRaw($key, ' <= ?', array($value));
-    }
-
-    public function havingGt($key, $value)
-    {
-        return $this->_havingRaw($key, ' > ?', array($value));
-    }
-
-    public function havingGte($key, $value)
-    {
-        return $this->_havingRaw($key, ' >= ?', array($value));
-    }
-
-    public function havingId($id) // do we need this function?
-    {
-        return $this->_havingRaw($this->_primaryKey, '=?', array($id));
-    }
-
-    public function havingIn($key, $values)
-    {
-        return $this->_havingIn($key, $values, true);
-    }
-
-    public function havingNotIn($key, $values)
-    {
-        return $this->_havingIn($key, $values, false);
-    }
-
-    private function _havingIn($key, $values, $is)
-    {
-        $ps = array_map(function ($v) { return '?'; }, $values);
-        $str = ($is ? ' ' : ' NOT ').'IN ('.implode(',', $qs).')';
-        return $this->_havingRaw($key, $str, $values);
-    }
-
-    private function _havingRaw($key, $midExpr, $values)
-    {
+        if ($value === null) {
+            return $this->having($key, '=', $op);
+        }
         $key = self::_backQuote($key);
-        return $this->havingRaw($key.$midExpr, $values);
+        if ($value instanceof Expression) {
+            $expr = "$keys $op ".$value->sql();
+            $values = $value->values();
+        } else {
+            $expr = "$keys $op ?";
+            $values = array($value);
+        }
+        return $this->havingRaw($expr, $values);
     }
 
     public function havingRaw($str, $values)
@@ -275,13 +153,11 @@ class Model
 
     public function groupBy($col)
     {
-        $colExpr = self::_backQuote($col);
-        return $this->groupByExpr($colExpr);
-    }
-
-    public function groupByExpr($colExpr)
-    {
-        $this->_groupbys[] = $colExpr;
+        if ($col instanceof Expression) {
+            $this->_groupbys[] = $col->sql();
+        } else {
+            $this->_groupbys[] = self::_backQuote($col);
+        }
         return $this;
     }
 
@@ -322,7 +198,7 @@ class Model
             $this->selectExpr(self::_backQuote($col));
         } elseif ($argNum == 2) {
             $as = func_get_arg(1);
-            $expr = self::_backQuote($col)." AS ".self::_backQuote($as);
+            $expr = self::_backQuote($col).' AS '.self::_backQuote($as);
             $this->selectExpr($expr);
         }
         return $this;
@@ -541,7 +417,7 @@ class Model
 
     private function _buildTable()
     {
-        $my = self::_backQuoteWord($this->_table);
+        $my = self::_backQuoteWord(self::table());
         if ($this->_as) {
             $my .= ' AS '.self::_backQuoteWord($this->_as);
         }
