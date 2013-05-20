@@ -15,7 +15,7 @@ spl_autoload_register(function ($class_name) {
 ob_start();
 session_start();
 
-Config::init(APP_ROOT.'config');
+Config::init(APP_ROOT.'config/');
 
 $router = new Router();
 $router->dispath();
