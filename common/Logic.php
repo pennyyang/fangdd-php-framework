@@ -15,6 +15,12 @@ class Logic
     {
         $classname = $name.'Model';
         require_once APP_ROOT."model/$classname.php";
+        if ($classname::$table === null) {
+            $classname::$table = preg_replace_callback('/[A-Z]/', function ($m) { return strtolower('_'.$m); }, lcfirst($name));
+        }
+        if ($classname::$pkey === null) {
+            $classname::$pkey = $classname::$table.'_id';
+        }
         return new $classname;
     }
 }
