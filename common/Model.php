@@ -47,4 +47,9 @@ class Model
     {
         return ORM::forTable(static::$table, static::$pkey)->where(static::$pkey, $id)->delete();
     }
+
+    public function __call($func, $args)
+    {
+        return call_user_func_array(array(ORM::forTable(static::$table, static::$pkey), $func), $args);
+    }
 }

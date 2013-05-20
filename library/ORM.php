@@ -104,20 +104,29 @@ class ORM
         $this->_pkey = $pkey;
     }
 
-    public function where($key, $op, $value = null)
+    /**
+     * where('username', 'Jack')
+     */
+    public function where($key, $op = null, $value = null)
     {
         if ($value === null) {
             return $this->where($key, '=', $op);
         }
-        $key = self::_backQuote($key);
-        if ($value instanceof Expression) {
-            $expr = "$keys $op ".$value->sql();
-            $values = $value->values();
+        if ($key instanceof Expression) {
+            $expr = $key->sql();
+            $values = $key->values();
         } else {
-            $expr = "$keys $op ?";
-            $values = array($value);
+            $key = self::_backQuote($key);
+            if ($value instanceof Expression) {
+                $expr = "$keys $op ".$value->sql();
+                $values = $value->values();
+            } else {
+                $expr = "$keys $op ?";
+                $values = array($value);
+            }
         }
-        return $this->whereRaw($expr, $values);
+        $this->_wheres[] = array($expr, $values);
+        return $this;
     }
 
     public static function _backQuote($key)
@@ -138,31 +147,25 @@ class ORM
         return $key;
     }
 
-    public function whereRaw($str, $values)
-    {
-        $this->_wheres[] = array($str => $values);
-        return $this;
-    }
-
     public function having($key, $op, $value = null)
     {
         if ($value === null) {
             return $this->having($key, '=', $op);
         }
-        $key = self::_backQuote($key);
-        if ($value instanceof Expression) {
-            $expr = "$keys $op ".$value->sql();
-            $values = $value->values();
+        if ($key instanceof Expression) {
+            $expr = $key->sql();
+            $values = $key->values();
         } else {
-            $expr = "$keys $op ?";
-            $values = array($value);
+            $key = self::_backQuote($key);
+            if ($value instanceof Expression) {
+                $expr = "$keys $op ".$value->sql();
+                $values = $value->values();
+            } else {
+                $expr = "$keys $op ?";
+                $values = array($value);
+            }
         }
-        return $this->havingRaw($expr, $values);
-    }
-
-    public function havingRaw($str, $values)
-    {
-        $this->_havings[] = array($str => $values);
+        $this->_havings[] = array($expr, $values);
         return $this;
     }
 
@@ -200,29 +203,42 @@ class ORM
         return $this->orderByExpr("$field ASC");
     }
 
-    public function orderByExpr($expr)
+    public function orderBy($expr)
     {
         $this->_orderbys[] = $expr;
         return $this;
     }
 
-    public function select($col)
+    public function select()
     {
         $argNum = func_num_args();
+        if ($argNum == 0) {
+            return $this->findMany();
+        }
+        $col = func_get_arg(0);
         if ($argNum == 1) {
-            $this->selectExpr(self::_backQuote($col));
-        } elseif ($argNum == 2) {
+            if ($col instanceof Expression) {
+                $col = $col->sql();
+            } elseif (is_array($col)) {
+                $expr = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
+            }
+            } else {
+                $col = self::_backQuote($col);
+            }
+            $this->_selects[] = $col;
+            return $this; 
+        }
+        if ($argNum == 2) {
             $as = func_get_arg(1);
             $expr = self::_backQuote($col).' AS '.self::_backQuote($as);
-            $this->selectExpr($expr);
+            $this->_selects[] = $expr;
         }
         return $this;
     }
 
-    public function selectExpr($expr)
+    public function columns($col)
     {
-        $this->_selects[] = $expr;
-        return $this;
+        return $this->select($col);
     }
 
     public function selectMany()
@@ -234,29 +250,11 @@ class ORM
             } elseif (is_array($col)) {
                 foreach ($col as $key => $value) {
                     if (is_int($key)) {
-                        $this->select($col);
+                        $this->select($value);
                     } elseif (is_string($key)) {
                         $this->select($key, $value);
                     }
                 }
-            }
-        }
-        return $this;
-    }
-
-    public function selectManyExpr()
-    {
-        $colExprs = func_get_args();
-        return $this->_selectManyExpr($colExprs);
-    }
-
-    private function _selectManyExpr($arr)
-    {
-        foreach ($arr as $key => $value) {
-            if (is_array($value)) {
-                $this->_selectManyExpr($value);
-            } elseif (is_string($value)) {
-                $this->selectExpr($value);
             }
         }
         return $this;
@@ -268,10 +266,18 @@ class ORM
         return $this;
     }
 
-    public function rawQuery($str, $values)
+    /**
+     * query('select * frorm user where user_id=?', array('3'))
+     */
+    public function query($str, $values = null)
     {
         $this->_raw = true;
+        if ($str instanceof Expression) {
+            $values = $str->values();
+            $str = $str->sql();
+        }
         $this->_query = array($str => $values);
+        return $this;
     }
 
     private function _buildWhere()
@@ -353,13 +359,13 @@ class ORM
         return $data ? new DataWrapper($this->_table, $value, $value[$this->_pkey]) : false;
     }
 
-    public function select()
+    public function findMany()
     {
         $data = $this->_fetch();
         $ret = array();
         foreach ($data as $key => $value) {
-            if (array_key_exists($this->_pkey, $value)) {
-                $id = $value[$this->_pkey];
+            if (array_key_exists($this->_primaryKey, $value)) {
+                $id = $value[$this->_primaryKey];
                 $ret[$id] = new DataWrapper($this->_table, $value, $id);
             } else {
                 $ret[] = new DataWrapper($this->_table, $value);
@@ -404,21 +410,35 @@ class ORM
         $this->selectExpr($expr);
     }
 
+    /**
+     * join(array('u' => 'user'), array('u.id', 'blog.user_id'))
+     */
     public function join($table, $on)
     {
-        if (is_array($on)) {
-            $on = self::_backQuote($on[0]).$on[1].self::_backQuote($on[2]);
-        }
-        if (func_num_args() == 3) {
-            $alias = func_get_arg(2);
+        if (is_array($table)) {
+            $alias = key($table);
+            $table = current($table);
             $this->_table($table, $alias);
-            $table = $alias;
+            $table
+        } else {
+            $this->_table($table);
+        }
+        if (is_array($on)) {
+            $left = self::_backQuote($on[0]);
+            if (count($on) = 2) {
+                $op = '=';
+                $right = self::_backQuote($on[1]);
+            } else {
+                $op = $on[1];
+                $right = self::_backQuote($on[2]);
+            }
+            $on = $left.$op.$right;
         }
         $this->_joins[] = array($table, $on);
         return $this;
     }
 
-    public function tableAs($name)
+    public function as($name)
     {
         $this->_as = $name;
         return $this;
