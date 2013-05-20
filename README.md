@@ -61,17 +61,18 @@ $this->model('user')
 
 more
 ```php
-from(array('b' => 'blog'))
-as('b')
-join(array('u' => 'user'), array('u.id', 'blog.user_id'))
-where(new Expression('`user_id`=? OR `username`=?', array('3', 'Jack')))
-orderBy('user_id DESC')
-groupBy('city_id')
-having('sum', '>', 33)
-distinct()
-query('select * frorm user where user_id=?', array('3'))
-getLastSql()
-update($args)
-insert($args)
-delete();
+$this->model
+    ->from(array('b' => 'blog'))
+    ->as('b')
+    ->join(array('u' => 'user'), array('u.id', 'blog.user_id'))
+    ->where(new Expression('`user_id`=? OR `username`=?', array('3', 'Jack')))
+    ->orderBy('user_id DESC')
+    ->groupBy('city_id')
+    ->having('sum', '>', 33)
+    ->distinct()
+    ->query('select * frorm user where user_id=?', array('3'))
+    ->getLastSql()
+    ->update($args)
+    ->insert($args)
+    ->delete()
 ```
