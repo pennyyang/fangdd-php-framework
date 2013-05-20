@@ -1,17 +1,17 @@
 <?php
 /**
-* 
+* 逻辑基类
 */
 class Logic
 {
-    public function logic($name)
+    protected function logic($name)
     {
         $classname = $name.'Logic';
         require_once APP_ROOT."logic/$classname.php";
         return new $classname;
     }
 
-    public function model($name)
+    protected function model($name)
     {
         $classname = $name.'Model';
         require_once APP_ROOT."model/$classname.php";

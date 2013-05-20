@@ -1,4 +1,7 @@
 <?php
+/**
+ * 引导文件
+ */
 
 require_once APP_ROOT.'common/Model.php';
 require_once APP_ROOT.'common/Logic.php';

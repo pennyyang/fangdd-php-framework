@@ -1,11 +1,11 @@
 <?php
 
 /**
-* 
+* 控制器的基类
 */
 class Controller
 {
-    public function logic($name)
+    protected function logic($name)
     {
         $classname = $name.'Logic';
         require_once APP_ROOT."logic/$classname.php";

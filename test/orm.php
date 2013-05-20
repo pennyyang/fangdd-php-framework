@@ -1,48 +1,12 @@
 <?php
 
-if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
-
-define('AROOT', dirname(__FILE__).DS);
-define('CROOT', AROOT.'..'.DS);
-
-error_reporting(E_ALL);
-ini_set('display_errors' , true);
-
-require_once CROOT.'lib'.DS.'db.function.php';
-require_once CROOT.'lib'.DS.'ORM.php';
-
-include "testify/testify.class.php";
-
-ORM::config('mysql:host=localhost;dbname=lazyartest');
-ORM::config('username', 'root');
-ORM::config('password', '');
-
-
-// 创建测试表
-class CreateDb {
-    public function __invoke() {
-        $db = ORM::db();
-        $init_sqls = explode(';', file_get_contents('test.sql'));
-        foreach ($init_sqls as $sql) {
-            $sql = trim($sql);
-            if (empty($sql)) {
-                break;
-            }
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-            if (intval($stmt->errorCode())) {
-                print_r($stmt->errorInfo());
-                exit;
-            }
-        }
-    }
-}
+Model::config('mysql:host=localhost;dbname=lazyartest');
+Model::config('username', 'root');
+Model::config('password', '');
 
 $tf = new Testify("ORM Test Suite");
 
 $tf->beforeEach(function($tf){
-    $c = new CreateDb();
-    $c();
 });
 
 $tf->test("Testing the config() method", function($tf){

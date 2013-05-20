@@ -1,6 +1,7 @@
 <?php
 /**
-* 
+* 配置
+* 只读
 */
 class Config
 {

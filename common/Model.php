@@ -26,7 +26,8 @@ class Expression
 }
 
 /**
-* ORM, Table
+* 模型类基类
+* 一个模型对应一张表
 */
 class Model
 {
@@ -615,7 +616,7 @@ class Model
 }
 
 /**
-* Row
+* 行数据包装器
 */
 class DataWrapper implements ArrayAccess
 {
