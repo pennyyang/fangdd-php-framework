@@ -1,8 +1,8 @@
 <?php
 
 require_once APP_ROOT.'common/Model.php';
-require_once APP_ROOT.'common/Controller.php';
 require_once APP_ROOT.'common/Logic.php';
+require_once APP_ROOT.'common/Controller.php';
 
 // auto load libary class
 spl_autoload_register(function ($class_name) {
@@ -14,6 +14,8 @@ spl_autoload_register(function ($class_name) {
 
 ob_start();
 session_start();
+
+Config::init(APP_ROOT.'config');
 
 $router = new Router();
 $router->dispath();

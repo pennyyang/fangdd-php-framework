@@ -32,5 +32,8 @@ fangdd-php-framework
 
 2. 简单的路由分发
 1. MVC（简单的模型、控制器、和渲染引擎（可以布局））
-3. 自带简单的ORM，使用 **工厂模式**
-4. 使用 memcache 的简单缓存，使用 **单例模式**
+
+盘点我们已经使用的设计模式
+- 单例模式(Singleton) `Model::db()`
+- 连贯接口(FluentInterface) `$model->where->find()`
+- 工厂方法(Factory Method) `$model->forTabel('user')`

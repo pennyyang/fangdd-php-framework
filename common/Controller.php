@@ -5,9 +5,10 @@
 */
 class Controller
 {
-    
-    function __construct(argument)
+    public function logic($name)
     {
-        # code...
+        $classname = $name.'Logic';
+        require_once APP_ROOT."logic/$classname.php";
+        return new $classname;
     }
 }
