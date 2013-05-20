@@ -104,6 +104,15 @@ class ORM
         $this->_pkey = $pkey;
     }
 
+    public function from($table)
+    {
+        if (is_array($table)) {
+            return $this->from(current($table))->as(key($table));
+        }
+        $this->_table = $table;
+        return $this;
+    }
+
     /**
      * where('username', 'Jack')
      */

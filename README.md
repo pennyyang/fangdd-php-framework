@@ -63,9 +63,10 @@ more
 ```php
 $this->model
     ->from(array('b' => 'blog'))
+    ->from('blog')
     ->as('b')
     ->join(array('u' => 'user'), array('u.id', 'blog.user_id'))
-    ->where(new Expression('`user_id`=? OR `username`=?', array('3', 'Jack')))
+    ->where(new Expression('(`user_id`=? OR `username`=?)', array('3', 'Jack')))
     ->orderBy('user_id DESC')
     ->groupBy('city_id')
     ->having('sum', '>', 33)
