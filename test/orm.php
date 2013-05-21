@@ -1,8 +1,9 @@
 <?php
 
-Model::config('mysql:host=localhost;dbname=lazyartest');
-Model::config('username', 'root');
-Model::config('password', '');
+ORM::config('mysql:host=localhost;dbname=test');
+ORM::config('username', 'root');
+ORM::config('password', '');
+
 
 $tf = new Testify("ORM Test Suite");
 
@@ -16,9 +17,13 @@ $tf->test("Testing the config() method", function($tf){
     ));
 });
 
-$tf->test("Testing the findOne(id) method", function($tf){
+$tf->test("Testing the query() method", function($tf){
+    ORM::forTable('x')->query(file_get_contents(TEST_ROOT.'orm.sql'));
+});
+
+$tf->test("Testing the find(id) method", function($tf){
     $personId = 1;
-    $person = ORM::forTable('person')->findOne($personId);
+    $person = ORM::forTable('person')->find($personId);
     $tf->assertEqual($person->name, "bill");
 });
 
@@ -28,10 +33,10 @@ $tf->test("Testing the where(k, v) method", function($tf){
     $tf->assertEqual($person->name, "bill");
 });
 
-$tf->test("Testing the whereLike(k, v) method", function($tf){
+$tf->test("Testing the where(k, 'LIKE', v) method", function($tf){
     $persons = ORM::forTable('person')
-        ->whereLike('name', '%ro%')
-        ->whereLt('age', 20)
+        ->where('name', 'LIKE', '%ro%')
+        ->where('age', '<', 20)
         ->findMany();
     $person = current($persons);
     $tf->assertEqual($person->age, 18);
