@@ -75,8 +75,8 @@ $tf->test("Testing the orderByDESC() method", function($tf){
 
 $tf->test("Testing the groupBy() method", function($tf){
     $genders = ORM::forTable('person')
-        ->selectExpr('gender')
-        ->selectExpr('count(id) as c')
+        ->column('gender')
+        ->column(new Expression('count(id) AS c'))
         ->groupBy('gender')
         ->findMany();
     $tf->assertEqual(count($genders), 2);
@@ -85,8 +85,8 @@ $tf->test("Testing the groupBy() method", function($tf){
 $tf->test("Testing the getLastSql() method", function($tf){
     ORM::config('logging', true);
     $personId = 1;
-    $person = ORM::forTable('person')->findOne($personId);
-    $tf->assertEqual(strlen(ORM::getLastSql()), 54);
+    $person = ORM::forTable('person')->find($personId);
+    $tf->assertEqual(ORM::getLastSql(), "SELECT * FROM `person` WHERE `id` = '1' LIMIT 1 OFFSET 0");
 });
 
 $tf->run();

@@ -207,13 +207,13 @@ class ORM
     public function orderByDESC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field DESC");
+        return $this->orderBy("$field DESC");
     }
 
     public function orderByASC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field ASC");
+        return $this->orderBy("$field ASC");
     }
 
     public function orderBy($expr)
@@ -224,33 +224,26 @@ class ORM
 
     public function select()
     {
+        return $this->findMany();
+    }
+
+    public function column($col, $as = null)
+    {
         $argNum = func_num_args();
-        if ($argNum == 0) {
-            return $this->findMany();
-        }
-        $col = func_get_arg(0);
-        if ($argNum == 1) {
+        if ($as === null) {
             if ($col instanceof Expression) {
                 $col = $col->sql();
             } elseif (is_array($col)) {
-                $expr = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
+                $col = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
             } else {
                 $col = self::_backQuote($col);
             }
-            $this->_selects[] = $col;
-            return $this;
-        }
-        if ($argNum == 2) {
-            $as = func_get_arg(1);
-            $expr = self::_backQuote($col).' AS '.self::_backQuote($as);
+        } else {
+            $col = self::_backQuote($col).' AS '.self::_backQuote($as);
             $this->_selects[] = $expr;
         }
+        $this->_selects[] = $col;
         return $this;
-    }
-
-    public function columns($col)
-    {
-        return $this->select($col);
     }
 
     public function selectMany()
@@ -366,7 +359,7 @@ class ORM
         $this->limit(1);
         $data = $this->_fetch();
         $value = current($data);
-        return $data ? new DataWrapper($this->_table, $value, $value[$this->_pkey]) : false;
+        return $data ? new DataWrapper($value) : false;
     }
 
     public function findMany()
@@ -374,11 +367,11 @@ class ORM
         $data = $this->_fetch();
         $ret = array();
         foreach ($data as $key => $value) {
-            if (array_key_exists($this->_primaryKey, $value)) {
-                $id = $value[$this->_primaryKey];
-                $ret[$id] = new DataWrapper($this->_table, $value, $id);
+            if (array_key_exists($this->_pkey, $value)) {
+                $id = $value[$this->_pkey];
+                $ret[$id] = new DataWrapper($value);
             } else {
-                $ret[] = new DataWrapper($this->_table, $value);
+                $ret[] = new DataWrapper($value);
             }
         }
         return $ret;
