@@ -1,8 +1,8 @@
 <?php
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * 下一步可以实现根据返回值自动渲染相应的模版文件
+ * 模版文件位置：/view/template/controller/action.phtml
  */
 
 class Router {
