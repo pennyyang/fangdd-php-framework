@@ -8,6 +8,7 @@ class Model
 {
     public static $table;
     public static $pkey;
+    private $_rules = array();
 
     public function table()
     {
@@ -51,5 +52,31 @@ class Model
     public function __call($func, $args)
     {
         return call_user_func_array(array(ORM::forTable(static::$table, static::$pkey), $func), $args);
+    }
+
+    public function conditions($conditions)
+    {
+        $this->_conditions = $conditions;
+        $orm = ORM::forTable(static::$table, static::$pkey);
+        foreach ($conditions as $field => $value) {
+            if (isset($this->_rules[$field])) {
+                $rule = $this->_rules[$field];
+                $orm->where($rule[0], $rule[1], isset($rule[2]) ? $rule[2] :$value);
+            } else {
+                $orm->where($field, $value);
+            }
+        }
+        return $orm;
+    }
+
+    /**
+     * rules(array(
+     *     'gt_age' => array('birth_year', '>');
+     * ));
+     */
+    public function rules($rules)
+    {
+        $this->_rules = $rules;
+        return $this;
     }
 }
