@@ -546,8 +546,10 @@ class ORM
         }
         $stmt->execute();
         if (intval($stmt->errorCode())) {
-            var_dump($sqlStr);
-            print_r($stmt->errorInfo());
+            if (self::$_config['debug']) {
+                var_dump($sqlStr);
+                var_dump($stmt->errorInfo());
+            }
             throw new Exception('db error: '.$stmt->errorCode());
         }
         return $stmt;
