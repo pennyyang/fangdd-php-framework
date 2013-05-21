@@ -18,7 +18,11 @@ $tf->test("Testing the config() method", function($tf){
 });
 
 $tf->test("Testing the query() method", function($tf){
-    ORM::forTable('x')->query(file_get_contents(TEST_ROOT.'orm.sql'));
+    foreach (explode(';', file_get_contents(TEST_ROOT.'orm.sql')) as $sql) {
+        if (trim($sql)) {
+            $stmt = ORM::forTable('x')->query(trim($sql));
+        }
+    }
 });
 
 $tf->test("Testing the find(id) method", function($tf){

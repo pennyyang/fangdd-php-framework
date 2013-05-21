@@ -282,15 +282,13 @@ class ORM
     /**
      * query('select * frorm user where user_id=?', array('3'))
      */
-    public function query($str, $values = null)
+    public function query($str, $values = array())
     {
-        $this->_raw = true;
         if ($str instanceof Expression) {
             $values = $str->values();
             $str = $str->sql();
         }
-        $this->_query = array($str => $values);
-        return $this;
+        return $this->_execute($str, $values);
     }
 
     private function _buildWhere()
@@ -336,9 +334,9 @@ class ORM
     {
         $strs = array();
         $values = array();
-        foreach ($raws as $key => $kv) {
-            $strs[] = $str = key($kv);
-            $vals = current($kv);
+        foreach ($raws as $kv) {
+            $strs[] = $str = $kv[0];
+            $vals = $kv[1];
             $values = array_merge($values, $vals);
         }
         $str = implode(' AND ', $strs);
@@ -552,6 +550,7 @@ class ORM
         }
         $stmt->execute();
         if (intval($stmt->errorCode())) {
+            var_dump($sqlStr);
             print_r($stmt->errorInfo());
             throw new Exception('db error: '.$stmt->errorCode());
         }
