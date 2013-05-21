@@ -4,7 +4,7 @@
  * 验证类
  * @author Kangwang Xie <kingwon680@gmail.com>
  */
-class validator {
+class Validator {
 
     static $fields = null;
     static $msg = null;
@@ -65,4 +65,3 @@ class validator {
 
 }
 
-?>

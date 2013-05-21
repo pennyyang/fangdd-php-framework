@@ -20,5 +20,6 @@ session_start();
 
 Config::init(APP_ROOT.'config/');
 
-$router = new Router();
+$arr = parse_url($_SERVER['REQUEST_URI']);
+$router = new Router($arr['path']);
 $router->dispath();

@@ -5,7 +5,7 @@
 */
 class Config
 {
-    private static $data;
+    private static $_data;
     public static function init($root)
     {
         self::$_data = array_merge(

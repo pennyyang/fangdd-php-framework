@@ -2,12 +2,13 @@ fangdd-php-framework
 ====================
 
 为积分赛所做的小框架。
+hh
 
 关于这个小框架，我觉得可以这么来：
 
 1. 实现路由（controller, 杨萍）和数据库（model, 王霄池），以及表单验证（valid, 谢康旺）
 1. 一切的表现形式都学迪哥的这个框架
-1. 但是底层的实现都自己写
+1. 但是底层的实现都 **自己写**
 1. 太复杂的不写
 1. 有自己的微创新
 
@@ -34,16 +35,23 @@ fangdd-php-framework
 1. MVC（简单的模型、控制器、和渲染引擎（可以布局））
 
 盘点我们已经使用的设计模式
-- 单例模式(Singleton) `Model::db()`
+- 单例模式(Singleton) `Model::db()` `Router::dispatch()`
 - 连贯接口(FluentInterface) `$model->where->find()`
 - 工厂方法(Factory Method) `$model->forTabel('user')`
 
 特征
 -----------
 
+**结构**
+
+1. 模仿房云框架结构
+2. 文件夹名称全部小写
+3. 自动载入 library 中的类
+
 **模型**
 
 定义
+
 ```php
 // table name: user
 // primary key: user_id
@@ -52,6 +60,7 @@ class UserModel extends Model {}
 ```
 
 查找
+
 ```php
 $this->model('user')
     ->where('gender', 'female')
@@ -59,13 +68,15 @@ $this->model('user')
     ->select();
 ```
 
-more
+more about search
+
 ```php
 $this->model
     ->from(array('b' => 'blog'))
-    ->as('b')
+    ->from('blog')
+    ->alias('b')
     ->join(array('u' => 'user'), array('u.id', 'blog.user_id'))
-    ->where(new Expression('`user_id`=? OR `username`=?', array('3', 'Jack')))
+    ->where(new Expression('(`user_id`=? OR `username`=?)', array('3', 'Jack')))
     ->orderBy('user_id DESC')
     ->groupBy('city_id')
     ->having('sum', '>', 33)
@@ -75,4 +86,25 @@ $this->model
     ->update($args)
     ->insert($args)
     ->delete()
+```
+
+write
+
+```php
+$this->model
+    ->query('select * frorm user where user_id=?', array('3'))
+    ->getLastSql()
+    ->update($args)
+    ->insert($args)
+    ->delete()
+```
+
+user condition for search
+
+```php
+$this->model
+    ->rules(array(
+    ))
+    ->conditions(get())
+    ->where(...)
 ```

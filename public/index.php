@@ -24,5 +24,4 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline, $errcontext) {
     error_log($msg, 3, $log_file);
     return ENV == 'prd';
 });
-
-include APP_ROOT.'lead.php';
+include APP_ROOT.'common/lead.php';

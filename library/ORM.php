@@ -104,6 +104,15 @@ class ORM
         $this->_pkey = $pkey;
     }
 
+    public function from($table)
+    {
+        if (is_array($table)) {
+            return $this->from(current($table))->as(key($table));
+        }
+        $this->_table = $table;
+        return $this;
+    }
+
     /**
      * where('username', 'Jack')
      */
@@ -221,12 +230,11 @@ class ORM
                 $col = $col->sql();
             } elseif (is_array($col)) {
                 $expr = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
-            }
             } else {
                 $col = self::_backQuote($col);
             }
             $this->_selects[] = $col;
-            return $this; 
+            return $this;
         }
         if ($argNum == 2) {
             $as = func_get_arg(1);
@@ -419,13 +427,12 @@ class ORM
             $alias = key($table);
             $table = current($table);
             $this->_table($table, $alias);
-            $table
         } else {
             $this->_table($table);
         }
         if (is_array($on)) {
             $left = self::_backQuote($on[0]);
-            if (count($on) = 2) {
+            if (count($on) == 2) {
                 $op = '=';
                 $right = self::_backQuote($on[1]);
             } else {
@@ -438,7 +445,7 @@ class ORM
         return $this;
     }
 
-    public function as($name)
+    public function alias($name)
     {
         $this->_as = $name;
         return $this;
