@@ -16,10 +16,8 @@ class Router {
     public function dispath() {
         $arr = explode('/', $this->url);
         unset($arr[0]);
-        $condition = $arr[1] . 'Controller.php';
         $method = $arr[2] . 'Action';
-        $u = 'x.me' . '/' . $condition;
-        require_once APP_ROOT . 'controller/' . $condition;
+        require_once APP_ROOT . 'controller/' . $arr[1] . '.php';
         $a = new $arr[1];
         $result = $a->$method();
         return $result;
@@ -27,4 +25,3 @@ class Router {
 
 }
 
-?>
