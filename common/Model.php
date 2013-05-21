@@ -9,6 +9,7 @@ class Model
     public static $table;
     public static $pkey;
     private $_rules = array();
+    protected $fields = array();
 
     public function table()
     {
@@ -78,5 +79,21 @@ class Model
     {
         $this->_rules = $rules;
         return $this;
+    }
+
+    public function filter($data)
+    {
+        $ret = array();
+        foreach ($this->fileds as $field => $value) {
+            if (isset($data[$field])) {
+                $ret[$field] = $value;
+            }
+        }
+        return $ret;
+    }
+
+    public function valid($data)
+    {
+
     }
 }
