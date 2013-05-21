@@ -246,6 +246,14 @@ class ORM
         return $this;
     }
 
+    public function columns($cols)
+    {
+        foreach ($cols as $col) {
+            $this->col($col);
+        }
+        return $this;
+    }
+
     public function selectMany()
     {
         $cols = func_get_args();
