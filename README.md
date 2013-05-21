@@ -44,6 +44,7 @@ fangdd-php-framework
 **模型**
 
 定义
+
 ```php
 // table name: user
 // primary key: user_id
@@ -52,6 +53,7 @@ class UserModel extends Model {}
 ```
 
 查找
+
 ```php
 $this->model('user')
     ->where('gender', 'female')
@@ -59,7 +61,8 @@ $this->model('user')
     ->select();
 ```
 
-more
+more about search
+
 ```php
 $this->model
     ->from(array('b' => 'blog'))
@@ -76,4 +79,25 @@ $this->model
     ->update($args)
     ->insert($args)
     ->delete()
+```
+
+write
+
+```php
+$this->model
+    ->query('select * frorm user where user_id=?', array('3'))
+    ->getLastSql()
+    ->update($args)
+    ->insert($args)
+    ->delete()
+```
+
+user condition
+
+```php
+$this->model
+    ->rules(array(
+    ))
+    ->conditions(get())
+    ->where(...)
 ```
