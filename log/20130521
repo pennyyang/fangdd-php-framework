@@ -1,0 +1,87 @@
+[12:05:02] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:02] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:18] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:18] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:05:37] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:37] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:05:39] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 27
+[12:06:06] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:06:06] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:06:24] PHP error 2
+include(D:\fangdd-php-framework\public/../lead.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:06:24] PHP error 2
+include() [<a href='function.include'>function.include</a>]: Failed opening 'D:\fangdd-php-framework\public/../lead.php' for inclusion (include_path='.;D:\wamp\bin\php\php5.3.5\PEAR')
+file: D:\fangdd-php-framework\public\index.php, line: 28
+[12:27:13] PHP error 8
+Undefined variable: urlArr
+file: D:\fangdd-php-framework\library\Router.php, line: 21
+[12:27:27] PHP error 8
+Undefined variable: urlArr
+file: D:\fangdd-php-framework\library\Router.php, line: 21
+[12:27:28] PHP error 8
+Undefined variable: urlArr
+file: D:\fangdd-php-framework\library\Router.php, line: 21
+[12:27:28] PHP error 8
+Undefined variable: urlArr
+file: D:\fangdd-php-framework\library\Router.php, line: 21
+[12:27:28] PHP error 8
+Undefined variable: urlArr
+file: D:\fangdd-php-framework\library\Router.php, line: 21
