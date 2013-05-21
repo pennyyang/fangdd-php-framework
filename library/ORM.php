@@ -45,7 +45,6 @@ class ORM
     );
 
     private $_pkey;
-    private $_raw = false;
     private $_count = false;
     private $_selects = array();
     private $_table;
@@ -472,9 +471,6 @@ class ORM
 
     private function _buildSelectSql()
     {
-        if ($this->_raw) {
-            return $this->_query;
-        }
         $field = $this->_buildField();
         $table = $this->_buildTable();
         list($where, $whereVals) = $this->_buildWhere();
