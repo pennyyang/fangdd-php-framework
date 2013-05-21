@@ -61,7 +61,7 @@ class Model
         foreach ($conditions as $field => $value) {
             if (isset($this->_rules[$field])) {
                 $rule = $this->_rules[$field];
-                $orm->where($rule[0], $rule[1], isset($rule[2]) ? $rule[2] :$value);
+                $orm->where($rule[0], isset($rule[1]) ? $rule[1] : '=', isset($rule[2]) ? $rule[2] :$value);
             } else {
                 $orm->where($field, $value);
             }
