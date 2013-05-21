@@ -127,15 +127,20 @@ class ORM
         } else {
             $key = self::_backQuote($key);
             if ($value instanceof Expression) {
-                $expr = "$keys $op ".$value->sql();
+                $expr = "$key $op ".$value->sql();
                 $values = $value->values();
             } else {
-                $expr = "$keys $op ?";
+                $expr = "$key $op ?";
                 $values = array($value);
             }
         }
         $this->_wheres[] = array($expr, $values);
         return $this;
+    }
+
+    public function whereId($id)
+    {
+        return $this->where($this->_pkey, '=', $id);
     }
 
     public static function _backQuote($key)
@@ -459,7 +464,7 @@ class ORM
 
     private function _buildTable()
     {
-        $my = self::_backQuoteWord(self::table());
+        $my = self::_backQuoteWord($this->_table);
         if ($this->_as) {
             $my .= ' AS '.self::_backQuoteWord($this->_as);
         }
