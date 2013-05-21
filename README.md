@@ -68,7 +68,7 @@ more about search
 $this->model
     ->from(array('b' => 'blog'))
     ->from('blog')
-    ->as('b')
+    ->alias('b')
     ->join(array('u' => 'user'), array('u.id', 'blog.user_id'))
     ->where(new Expression('(`user_id`=? OR `username`=?)', array('3', 'Jack')))
     ->orderBy('user_id DESC')

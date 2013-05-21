@@ -13,13 +13,17 @@ class Router {
         $this->url = $url;
     }
 
+    /**
+     * default indexController::indexAction()
+     */
     public function dispath() {
         $arr = explode('/', $this->url);
         unset($arr[0]);
-        $method = $arr[2] . 'Action';
-        require_once APP_ROOT . 'controller/' . $arr[1] . '.php';
-        $a = new $arr[1];
-        $result = $a->$method();
+        $controller = (isset($arr[1]) && $arr[1] ? $arr[1] : 'index').'Controller';
+        $action = (isset($arr[2]) && $arr[2] ? $arr[2] : 'index') . 'Action';
+        require_once APP_ROOT . 'controller/' . $controller . '.php';
+        $a = new $controller;
+        $result = $a->$action();
         return $result;
     }
 

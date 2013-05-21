@@ -8,9 +8,9 @@ class Controller
     public function __construct()
     {
         $db_conf = Config::get('db');
-        Model::config($db_conf['dsn']);
-        Model::config('username', $db_conf['username']);
-        Model::config('password', $db_conf['password']);
+        ORM::config($db_conf['dsn']);
+        ORM::config('username', $db_conf['username']);
+        ORM::config('password', $db_conf['password']);
     }
 
     protected function logic($name)

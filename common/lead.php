@@ -21,5 +21,4 @@ Config::init(APP_ROOT.'config/');
 
 $arr = parse_url($_SERVER['REQUEST_URI']);
 $router = new Router($arr['path']);
-$ss = $router->dispath();
-var_dump($ss);
+$router->dispath();
