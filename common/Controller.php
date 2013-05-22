@@ -19,4 +19,11 @@ class Controller
         require_once APP_ROOT."logic/$classname.php";
         return new $classname;
     }
+
+    protected function json($data)
+    {
+        header('Content-Type:application/json');
+        echo json_encode($data);
+        return false;
+    }
 }
