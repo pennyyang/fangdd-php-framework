@@ -57,6 +57,8 @@ class ORM
     private $_distinct = false;
     private $_limit = 1000;
     private $_offset = 0;
+    private $_raw = false;
+    private $_query;
 
     public static function config()
     {
@@ -280,15 +282,16 @@ class ORM
     }
 
     /**
-     * query('select * frorm user where user_id=?', array('3'))
+     * query('select * frorm user where user_id=?', array('3'))->select()
      */
     public function query($str, $values = array())
     {
-        if ($str instanceof Expression) {
-            $values = $str->values();
-            $str = $str->sql();
+        $this->_raw = true;
+        if (!($str instanceof Expression)) {
+            $str = new Expression($str, $values);
         }
-        return $this->_execute($str, $values);
+        $this->_query = $str;
+        return $this;
     }
 
     private function _buildWhere()
@@ -523,7 +526,12 @@ class ORM
 
     private function _fetch()
     {
-        list($sqlStr, $values) = $this->_buildSelectSql();
+        if ($this->_raw) {
+            $sqlStr = $this->_query->sql();
+            $values = $this->_query->values();
+        } else {
+            list($sqlStr, $values) = $this->_buildSelectSql();
+        }
 
         $stmt = self::_execute($sqlStr, $values);
 
@@ -536,6 +544,14 @@ class ORM
             }
         }
         return $ret ?: array();
+    }
+
+    public function execute()
+    {
+        if ($this->_raw) {
+            return self::_execute($this->_query->sql(), $this->_query->values());
+        }
+        return false;
     }
 
     private static function _execute($sqlStr, $values)
