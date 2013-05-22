@@ -45,7 +45,6 @@ class ORM
     );
 
     private $_pkey;
-    private $_raw = false;
     private $_count = false;
     private $_selects = array();
     private $_table;
@@ -127,15 +126,20 @@ class ORM
         } else {
             $key = self::_backQuote($key);
             if ($value instanceof Expression) {
-                $expr = "$keys $op ".$value->sql();
+                $expr = "$key $op ".$value->sql();
                 $values = $value->values();
             } else {
-                $expr = "$keys $op ?";
+                $expr = "$key $op ?";
                 $values = array($value);
             }
         }
         $this->_wheres[] = array($expr, $values);
         return $this;
+    }
+
+    public function whereId($id)
+    {
+        return $this->where($this->_pkey, '=', $id);
     }
 
     public static function _backQuote($key)
@@ -203,13 +207,13 @@ class ORM
     public function orderByDESC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field DESC");
+        return $this->orderBy("$field DESC");
     }
 
     public function orderByASC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field ASC");
+        return $this->orderBy("$field ASC");
     }
 
     public function orderBy($expr)
@@ -220,34 +224,34 @@ class ORM
 
     public function select()
     {
+        return $this->findMany();
+    }
+
+    public function column($col, $as = null)
+    {
         $argNum = func_num_args();
-        if ($argNum == 0) {
-            return $this->findMany();
-        }
-        $col = func_get_arg(0);
-        if ($argNum == 1) {
+        if ($as === null) {
             if ($col instanceof Expression) {
                 $col = $col->sql();
             } elseif (is_array($col)) {
-                $expr = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
-            }
+                $col = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
             } else {
                 $col = self::_backQuote($col);
             }
-            $this->_selects[] = $col;
-            return $this; 
-        }
-        if ($argNum == 2) {
-            $as = func_get_arg(1);
-            $expr = self::_backQuote($col).' AS '.self::_backQuote($as);
+        } else {
+            $col = self::_backQuote($col).' AS '.self::_backQuote($as);
             $this->_selects[] = $expr;
         }
+        $this->_selects[] = $col;
         return $this;
     }
 
-    public function columns($col)
+    public function columns($cols)
     {
-        return $this->select($col);
+        foreach ($cols as $col) {
+            $this->col($col);
+        }
+        return $this;
     }
 
     public function selectMany()
@@ -278,15 +282,13 @@ class ORM
     /**
      * query('select * frorm user where user_id=?', array('3'))
      */
-    public function query($str, $values = null)
+    public function query($str, $values = array())
     {
-        $this->_raw = true;
         if ($str instanceof Expression) {
             $values = $str->values();
             $str = $str->sql();
         }
-        $this->_query = array($str => $values);
-        return $this;
+        return $this->_execute($str, $values);
     }
 
     private function _buildWhere()
@@ -332,9 +334,9 @@ class ORM
     {
         $strs = array();
         $values = array();
-        foreach ($raws as $key => $kv) {
-            $strs[] = $str = key($kv);
-            $vals = current($kv);
+        foreach ($raws as $kv) {
+            $strs[] = $str = $kv[0];
+            $vals = $kv[1];
             $values = array_merge($values, $vals);
         }
         $str = implode(' AND ', $strs);
@@ -365,7 +367,7 @@ class ORM
         $this->limit(1);
         $data = $this->_fetch();
         $value = current($data);
-        return $data ? new DataWrapper($this->_table, $value, $value[$this->_pkey]) : false;
+        return $data ? new DataWrapper($value) : false;
     }
 
     public function findMany()
@@ -373,11 +375,11 @@ class ORM
         $data = $this->_fetch();
         $ret = array();
         foreach ($data as $key => $value) {
-            if (array_key_exists($this->_primaryKey, $value)) {
-                $id = $value[$this->_primaryKey];
-                $ret[$id] = new DataWrapper($this->_table, $value, $id);
+            if (array_key_exists($this->_pkey, $value)) {
+                $id = $value[$this->_pkey];
+                $ret[$id] = new DataWrapper($value);
             } else {
-                $ret[] = new DataWrapper($this->_table, $value);
+                $ret[] = new DataWrapper($value);
             }
         }
         return $ret;
@@ -428,13 +430,12 @@ class ORM
             $alias = key($table);
             $table = current($table);
             $this->_table($table, $alias);
-            $table
         } else {
             $this->_table($table);
         }
         if (is_array($on)) {
             $left = self::_backQuote($on[0]);
-            if (count($on) = 2) {
+            if (count($on) == 2) {
                 $op = '=';
                 $right = self::_backQuote($on[1]);
             } else {
@@ -447,7 +448,7 @@ class ORM
         return $this;
     }
 
-    public function as($name)
+    public function alias($name)
     {
         $this->_as = $name;
         return $this;
@@ -461,7 +462,7 @@ class ORM
 
     private function _buildTable()
     {
-        $my = self::_backQuoteWord(self::table());
+        $my = self::_backQuoteWord($this->_table);
         if ($this->_as) {
             $my .= ' AS '.self::_backQuoteWord($this->_as);
         }
@@ -471,9 +472,6 @@ class ORM
 
     private function _buildSelectSql()
     {
-        if ($this->_raw) {
-            return $this->_query;
-        }
         $field = $this->_buildField();
         $table = $this->_buildTable();
         list($where, $whereVals) = $this->_buildWhere();
@@ -549,7 +547,10 @@ class ORM
         }
         $stmt->execute();
         if (intval($stmt->errorCode())) {
-            print_r($stmt->errorInfo());
+            if (self::$_config['debug']) {
+                var_dump($sqlStr);
+                var_dump($stmt->errorInfo());
+            }
             throw new Exception('db error: '.$stmt->errorCode());
         }
         return $stmt;

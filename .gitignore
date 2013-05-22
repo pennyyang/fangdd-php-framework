@@ -1,2 +1,4 @@
 .DS_Store
-/nbproject/private/
+/nbproject/
+/log
+/test/log.sql

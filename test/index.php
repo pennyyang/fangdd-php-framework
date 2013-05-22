@@ -6,9 +6,17 @@ error_reporting(E_ALL | E_STRICT);
 define('APP_ROOT', __DIR__.'/../');
 define('TEST_ROOT', __DIR__.'/');
 
+spl_autoload_register(function ($class_name) {
+    $fpath = APP_ROOT.'library/'.$class_name.'.php';
+    if (file_exists($fpath)) {
+        require_once $fpath;
+    }
+});
+
 require_once '../vendor/testify/testify.class.php';
 
-if ($f = file_exists(_name().'.php')) {
+$f = _name().'.php';
+if (file_exists($f)) {
     include $f;
 } else {
     die('no file '.$f);
@@ -16,6 +24,7 @@ if ($f = file_exists(_name().'.php')) {
 
 function _name()
 {
-    $req_uri = reset(explode('?', $_SERVER['REQUEST_URI']));
+    $arr = parse_url($_SERVER['REQUEST_URI']);
+    $req_uri = $arr['path'];
     return trim($req_uri, '/');
 }
