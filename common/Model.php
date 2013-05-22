@@ -63,7 +63,7 @@ class Model
             if (isset($this->_rules[$field])) {
                 $rule = $this->_rules[$field];
                 $orm->where($rule[0], isset($rule[1]) ? $rule[1] : '=', isset($rule[2]) ? $rule[2] :$value);
-            } else {
+            } elseif (isset($this->fields[$field])) {
                 $orm->where($field, $value);
             }
         }

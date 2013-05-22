@@ -7,9 +7,6 @@ ORM::config('password', '');
 
 $tf = new Testify("ORM Test Suite");
 
-$tf->beforeEach(function($tf){
-});
-
 $tf->test("Testing the config() method", function($tf){
     ORM::config(array(
         'logging' => true,
@@ -20,7 +17,7 @@ $tf->test("Testing the config() method", function($tf){
 $tf->test("Testing the query() method", function($tf){
     foreach (explode(';', file_get_contents(TEST_ROOT.'orm.sql')) as $sql) {
         if (trim($sql)) {
-            $stmt = ORM::forTable('x')->query(trim($sql));
+            $stmt = ORM::forTable('x')->query(trim($sql))->execute();
         }
     }
 });

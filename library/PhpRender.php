@@ -5,9 +5,10 @@
 class PhpRender
 {
     private $_data = array();
+    private $_layout;
     private $_tpl = 'index.phtml';
 
-    protected function __get($var)
+    public function __get($var)
     {
         return isset($this->_data[$var]) ? $this->_data[$var] : null;
     }
@@ -18,12 +19,22 @@ class PhpRender
         return $this;
     }
 
+    public function vars()
+    {
+        return $this->_data;
+    }
+
     public function __construct($data = array())
     {
         $this->_data = $data;
     }
 
-    public function setTemplate($tpl)
+    public function layout($tpl)
+    {
+        $this->_layout = $tpl;
+    }
+
+    public function template($tpl)
     {
         $this->_tpl = $tpl;
     }
@@ -36,15 +47,20 @@ class PhpRender
         if ($data !== null) {
             $this->_data = $data;
         }
-        extract($this->$data);
-        include APP_ROOT.'view/template/'.$this->_tpl;
+        extract($this->_data);
+        if ($this->_layout) {
+            include APP_ROOT.'view/layout/'.$this->_layout;
+        } else {
+            include APP_ROOT.'view/template/'.$this->_tpl;
+        }
     }
 
-    public static function init($root)
+    public function yield()
     {
-        self::$_data = array_merge(
-            include $root.'app.config.php',
-            include $root.ENV.'.config.php'
-        );
+        $old_layout = $this->_layout;
+        $this->_layout = null;
+        $this->render();
+        $this->_layout = $old_layout;
     }
+
 }
