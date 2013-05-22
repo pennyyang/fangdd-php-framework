@@ -119,10 +119,10 @@ class ORM
      */
     public function where($key, $op = null, $value = null)
     {
-        if ($value === null) {
+        if ($op !== null && $value === null) {
             return $this->where($key, '=', $op);
         }
-        if ($key instanceof Expression) {
+        if ($key instanceof Expression && $op === null && $value = null) {
             $expr = $key->sql();
             $values = $key->values();
         } else {
