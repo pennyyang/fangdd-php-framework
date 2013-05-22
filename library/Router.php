@@ -1,8 +1,12 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 下一步可以实现根据返回值自动渲染相应的模版文件
+ * 模版文件位置：/view/template/controller/action.phtml
+ *
+ * 下下步，可以指定路由规则
+ * rule()
+ * rules()
  */
 
 class Router {
@@ -13,18 +17,19 @@ class Router {
         $this->url = $url;
     }
 
+    /**
+     * default indexController::indexAction()
+     */
     public function dispath() {
         $arr = explode('/', $this->url);
         unset($arr[0]);
-        $condition = $arr[1] . 'Controller.php';
-        $method = $arr[2] . 'Action';
-        $u = 'x.me' . '/' . $condition;
-        require_once APP_ROOT . 'controller/' . $condition;
-        $a = new $arr[1];
-        $result = $a->$method();
+        $controller = (isset($arr[1]) && $arr[1] ? $arr[1] : 'index').'Controller';
+        $action = (isset($arr[2]) && $arr[2] ? $arr[2] : 'index') . 'Action';
+        require_once APP_ROOT . 'controller/' . $controller . '.php';
+        $a = new $controller;
+        $result = $a->$action();
         return $result;
     }
 
 }
 
-?>
