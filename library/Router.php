@@ -1,8 +1,12 @@
 <?php
 
-/*
+/**
  * 下一步可以实现根据返回值自动渲染相应的模版文件
  * 模版文件位置：/view/template/controller/action.phtml
+ *
+ * 下下步，可以指定路由规则
+ * rule()
+ * rules()
  */
 
 class Router {
