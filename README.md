@@ -99,6 +99,7 @@ user condition for search
 ```php
 $this->model
     ->rules(array(
+        'gt_age' => array('birth_year', '>');
     ))
     ->conditions(get())
     ->where(...)
