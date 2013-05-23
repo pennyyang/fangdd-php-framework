@@ -38,5 +38,17 @@ class Router {
         return $result;
     }
 
+    /**
+     * 新增一条路由规则
+     * $router->rule('GET', '/user/[:id]', array('user', 'view'))
+     * 第一个参数是HTTP方法
+     * 第二个参数是URL规则，其中方括号冒号开头代指一个参数，放到 $_GET 数组中
+     * 第三个参数是一个数组 array('控制器', 'Action')
+     */
+    public function rule()
+    {
+
+    }
+
 }
 
