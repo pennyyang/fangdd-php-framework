@@ -9,7 +9,6 @@ class Model
     public static $table;
     public static $pkey;
     private $_rules = array();
-    protected $fields = array();
 
     public function table()
     {
@@ -28,21 +27,25 @@ class Model
     
     public function get($id)
     {
-        return ORM::forTable(static::$table, static::$pkey)->findOne($id);
+        return ORM::forTable(static::$table, static::$pkey)->find($id);
     }
 
     public function edit($id, $args)
     {
         $data = $this->filter($args);
-        $valid_data = $this->valid($data);
-        return ORM::forTable(static::$table, static::$pkey)->where(static::$pkey, $id)->update($valid_data);
+        if (($valid = $this->valid($data)) !== true) {
+            return reset(reset($valid));
+        }
+        return ORM::forTable(static::$table, static::$pkey)->where(static::$pkey, $id)->update($data);
     }
 
     public function add($args)
     {
         $data = $this->filter($args);
-        $valid_data = $this->valid($data);
-        return ORM::forTable(static::$table, static::$pkey)->insert($valid_data);
+        if (($valid = $this->valid($data)) !== true) {
+            return reset(reset($valid));
+        }
+        return ORM::forTable(static::$table, static::$pkey)->insert($data);
     }
 
     public function delete($id)
@@ -83,8 +86,11 @@ class Model
 
     public function filter($data)
     {
+        if (!isset(static::$fileds)) {
+            return $data;
+        }
         $ret = array();
-        foreach ($this->fileds as $field => $value) {
+        foreach (static::$fileds as $field => $value) {
             if (isset($data[$field])) {
                 $ret[$field] = $value;
             }
@@ -94,6 +100,6 @@ class Model
 
     public function valid($data)
     {
-
+        return true;
     }
 }
