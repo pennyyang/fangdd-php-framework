@@ -27,21 +27,25 @@ class Model
     
     public function get($id)
     {
-        return ORM::forTable(static::$table, static::$pkey)->findOne($id);
+        return ORM::forTable(static::$table, static::$pkey)->find($id);
     }
 
     public function edit($id, $args)
     {
         $data = $this->filter($args);
-        $valid_data = $this->valid($data);
-        return ORM::forTable(static::$table, static::$pkey)->where(static::$pkey, $id)->update($valid_data);
+        if (($valid = $this->valid($data)) !== true) {
+            return reset(reset($valid));
+        }
+        return ORM::forTable(static::$table, static::$pkey)->where(static::$pkey, $id)->update($data);
     }
 
     public function add($args)
     {
         $data = $this->filter($args);
-        $valid_data = $this->valid($data);
-        return ORM::forTable(static::$table, static::$pkey)->insert($valid_data);
+        if (($valid = $this->valid($data)) !== true) {
+            return reset(reset($valid));
+        }
+        return ORM::forTable(static::$table, static::$pkey)->insert($data);
     }
 
     public function delete($id)
@@ -62,7 +66,7 @@ class Model
             if (isset($this->_rules[$field])) {
                 $rule = $this->_rules[$field];
                 $orm->where($rule[0], isset($rule[1]) ? $rule[1] : '=', isset($rule[2]) ? $rule[2] :$value);
-            } else {
+            } elseif (isset($this->fields[$field])) {
                 $orm->where($field, $value);
             }
         }
@@ -78,5 +82,24 @@ class Model
     {
         $this->_rules = $rules;
         return $this;
+    }
+
+    public function filter($data)
+    {
+        if (!isset(static::$fields)) {
+            return $data;
+        }
+        $ret = array();
+        foreach (static::$fields as $field => $value) {
+            if (isset($data[$field])) {
+                $ret[$field] = $data[$field];
+            }
+        }
+        return $ret;
+    }
+
+    public function valid($data)
+    {
+        return true;
     }
 }

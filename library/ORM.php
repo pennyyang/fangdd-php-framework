@@ -45,7 +45,6 @@ class ORM
     );
 
     private $_pkey;
-    private $_raw = false;
     private $_count = false;
     private $_selects = array();
     private $_table;
@@ -58,21 +57,20 @@ class ORM
     private $_distinct = false;
     private $_limit = 1000;
     private $_offset = 0;
+    private $_raw = false;
+    private $_query;
 
-    public static function config()
+    public static function config($key)
     {
-        $argNum = func_num_args();
-        if ($argNum == 1) {
-            $a = func_get_arg(0);
-            if (is_string($a)) {
-                self::$_config['dsn'] = $a;
-            } elseif (is_array($a)) {
-                foreach ($a as $key => $value) {
-                    self::$_config[$key] = $value;
+        if (func_num_args() == 1) {
+            if (is_string($key)) {
+                self::$_config['dsn'] = $key;
+            } elseif (is_array($key)) {
+                foreach ($key as $k => $v) {
+                    self::$_config[$k] = $v;
                 }
             }
         } else {
-            $key   = func_get_arg(0);
             $value = func_get_arg(1);
             self::$_config[$key] = $value;
         }
@@ -90,7 +88,7 @@ class ORM
         return self::$_db;
     }
 
-    public static function forTable($table, $pkey = null)
+    public static function forTable($table = null, $pkey = null)
     {
         if ($pkey === null) {
             $pkey = 'id';
@@ -107,7 +105,7 @@ class ORM
     public function from($table)
     {
         if (is_array($table)) {
-            return $this->from(current($table))->as(key($table));
+            return $this->from(current($table))->alias(key($table));
         }
         $this->_table = $table;
         return $this;
@@ -118,24 +116,29 @@ class ORM
      */
     public function where($key, $op = null, $value = null)
     {
-        if ($value === null) {
+        if ($op !== null && $value === null) {
             return $this->where($key, '=', $op);
         }
-        if ($key instanceof Expression) {
+        if ($key instanceof Expression && $op === null && $value = null) {
             $expr = $key->sql();
             $values = $key->values();
         } else {
             $key = self::_backQuote($key);
             if ($value instanceof Expression) {
-                $expr = "$keys $op ".$value->sql();
+                $expr = "$key $op ".$value->sql();
                 $values = $value->values();
             } else {
-                $expr = "$keys $op ?";
+                $expr = "$key $op ?";
                 $values = array($value);
             }
         }
         $this->_wheres[] = array($expr, $values);
         return $this;
+    }
+
+    public function whereId($id)
+    {
+        return $this->where($this->_pkey, '=', $id);
     }
 
     public static function _backQuote($key)
@@ -203,13 +206,13 @@ class ORM
     public function orderByDESC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field DESC");
+        return $this->orderBy("$field DESC");
     }
 
     public function orderByASC($field)
     {
         $field = self::_backQuote($field);
-        return $this->orderByExpr("$field ASC");
+        return $this->orderBy("$field ASC");
     }
 
     public function orderBy($expr)
@@ -220,33 +223,34 @@ class ORM
 
     public function select()
     {
+        return $this->findMany();
+    }
+
+    public function column($col, $as = null)
+    {
         $argNum = func_num_args();
-        if ($argNum == 0) {
-            return $this->findMany();
-        }
-        $col = func_get_arg(0);
-        if ($argNum == 1) {
+        if ($as === null) {
             if ($col instanceof Expression) {
                 $col = $col->sql();
             } elseif (is_array($col)) {
-                $expr = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
+                $col = self::_backQuote(key($col)).' AS '.self::_backQuote(current($col));
             } else {
                 $col = self::_backQuote($col);
             }
-            $this->_selects[] = $col;
-            return $this;
-        }
-        if ($argNum == 2) {
-            $as = func_get_arg(1);
-            $expr = self::_backQuote($col).' AS '.self::_backQuote($as);
+        } else {
+            $col = self::_backQuote($col).' AS '.self::_backQuote($as);
             $this->_selects[] = $expr;
         }
+        $this->_selects[] = $col;
         return $this;
     }
 
-    public function columns($col)
+    public function columns($cols)
     {
-        return $this->select($col);
+        foreach ($cols as $col) {
+            $this->col($col);
+        }
+        return $this;
     }
 
     public function selectMany()
@@ -275,16 +279,15 @@ class ORM
     }
 
     /**
-     * query('select * frorm user where user_id=?', array('3'))
+     * query('select * frorm user where user_id=?', array('3'))->select()
      */
-    public function query($str, $values = null)
+    public function query($str, $values = array())
     {
         $this->_raw = true;
-        if ($str instanceof Expression) {
-            $values = $str->values();
-            $str = $str->sql();
+        if (!($str instanceof Expression)) {
+            $str = new Expression($str, $values);
         }
-        $this->_query = array($str => $values);
+        $this->_query = $str;
         return $this;
     }
 
@@ -331,9 +334,9 @@ class ORM
     {
         $strs = array();
         $values = array();
-        foreach ($raws as $key => $kv) {
-            $strs[] = $str = key($kv);
-            $vals = current($kv);
+        foreach ($raws as $kv) {
+            $strs[] = $str = $kv[0];
+            $vals = $kv[1];
             $values = array_merge($values, $vals);
         }
         $str = implode(' AND ', $strs);
@@ -364,7 +367,7 @@ class ORM
         $this->limit(1);
         $data = $this->_fetch();
         $value = current($data);
-        return $data ? new DataWrapper($this->_table, $value, $value[$this->_pkey]) : false;
+        return $data ? new DataWrapper($value) : false;
     }
 
     public function findMany()
@@ -372,11 +375,11 @@ class ORM
         $data = $this->_fetch();
         $ret = array();
         foreach ($data as $key => $value) {
-            if (array_key_exists($this->_primaryKey, $value)) {
-                $id = $value[$this->_primaryKey];
-                $ret[$id] = new DataWrapper($this->_table, $value, $id);
+            if (array_key_exists($this->_pkey, $value)) {
+                $id = $value[$this->_pkey];
+                $ret[$id] = new DataWrapper($value);
             } else {
-                $ret[] = new DataWrapper($this->_table, $value);
+                $ret[] = new DataWrapper($value);
             }
         }
         return $ret;
@@ -459,7 +462,7 @@ class ORM
 
     private function _buildTable()
     {
-        $my = self::_backQuoteWord(self::table());
+        $my = self::_backQuoteWord($this->_table);
         if ($this->_as) {
             $my .= ' AS '.self::_backQuoteWord($this->_as);
         }
@@ -469,9 +472,6 @@ class ORM
 
     private function _buildSelectSql()
     {
-        if ($this->_raw) {
-            return $this->_query;
-        }
         $field = $this->_buildField();
         $table = $this->_buildTable();
         list($where, $whereVals) = $this->_buildWhere();
@@ -523,7 +523,12 @@ class ORM
 
     private function _fetch()
     {
-        list($sqlStr, $values) = $this->_buildSelectSql();
+        if ($this->_raw) {
+            $sqlStr = $this->_query->sql();
+            $values = $this->_query->values();
+        } else {
+            list($sqlStr, $values) = $this->_buildSelectSql();
+        }
 
         $stmt = self::_execute($sqlStr, $values);
 
@@ -538,6 +543,14 @@ class ORM
         return $ret ?: array();
     }
 
+    public function execute()
+    {
+        if ($this->_raw) {
+            return self::_execute($this->_query->sql(), $this->_query->values());
+        }
+        return false;
+    }
+
     private static function _execute($sqlStr, $values)
     {
         $db = self::db();
@@ -547,7 +560,10 @@ class ORM
         }
         $stmt->execute();
         if (intval($stmt->errorCode())) {
-            print_r($stmt->errorInfo());
+            if (self::$_config['debug']) {
+                var_dump($sqlStr);
+                var_dump($stmt->errorInfo());
+            }
             throw new Exception('db error: '.$stmt->errorCode());
         }
         return $stmt;
@@ -647,7 +663,7 @@ class DataWrapper implements ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        return $this;
+        return $this->set($offset, $value);
     }
 
     public function offsetUnset($offset)
@@ -663,6 +679,16 @@ class DataWrapper implements ArrayAccess
     public function _isset($name)
     {
         return isset($this->_info[$name]);
+    }
+
+    public function set($name, $value)
+    {
+        $this->_info[$name] = $value;
+    }
+
+    public function __set($name, $value)
+    {
+        return $this->set($name, $value);
     }
 
     public function toArray()
