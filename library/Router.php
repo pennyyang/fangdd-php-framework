@@ -23,11 +23,18 @@ class Router {
     public function dispath() {
         $arr = explode('/', $this->url);
         unset($arr[0]);
-        $controller = (isset($arr[1]) && $arr[1] ? $arr[1] : 'index').'Controller';
-        $action = (isset($arr[2]) && $arr[2] ? $arr[2] : 'index') . 'Action';
+        $contr = isset($arr[1]) && $arr[1] ? $arr[1] : 'index';
+        $controller = $contr.'Controller';
+        $act = isset($arr[2]) && $arr[2] ? $arr[2] : 'index';
+        $action = $act . 'Action';
         require_once APP_ROOT . 'controller/' . $controller . '.php';
-        $a = new $controller;
-        $result = $a->$action();
+        $c = new $controller;
+        $result = $c->$action();
+        if (is_array($result)) {
+            $view = new View($result);
+            $view->template($contr.'/'.$act);
+            return $view;
+        }
         return $result;
     }
 

@@ -57,21 +57,20 @@ class ORM
     private $_distinct = false;
     private $_limit = 1000;
     private $_offset = 0;
+    private $_raw = false;
+    private $_query;
 
-    public static function config()
+    public static function config($key)
     {
-        $argNum = func_num_args();
-        if ($argNum == 1) {
-            $a = func_get_arg(0);
-            if (is_string($a)) {
-                self::$_config['dsn'] = $a;
-            } elseif (is_array($a)) {
-                foreach ($a as $key => $value) {
-                    self::$_config[$key] = $value;
+        if (func_num_args() == 1) {
+            if (is_string($key)) {
+                self::$_config['dsn'] = $key;
+            } elseif (is_array($key)) {
+                foreach ($key as $k => $v) {
+                    self::$_config[$k] = $v;
                 }
             }
         } else {
-            $key   = func_get_arg(0);
             $value = func_get_arg(1);
             self::$_config[$key] = $value;
         }
@@ -106,7 +105,7 @@ class ORM
     public function from($table)
     {
         if (is_array($table)) {
-            return $this->from(current($table))->as(key($table));
+            return $this->from(current($table))->alias(key($table));
         }
         $this->_table = $table;
         return $this;
@@ -117,10 +116,10 @@ class ORM
      */
     public function where($key, $op = null, $value = null)
     {
-        if ($value === null) {
+        if ($op !== null && $value === null) {
             return $this->where($key, '=', $op);
         }
-        if ($key instanceof Expression) {
+        if ($key instanceof Expression && $op === null && $value = null) {
             $expr = $key->sql();
             $values = $key->values();
         } else {
@@ -280,15 +279,16 @@ class ORM
     }
 
     /**
-     * query('select * frorm user where user_id=?', array('3'))
+     * query('select * frorm user where user_id=?', array('3'))->select()
      */
     public function query($str, $values = array())
     {
-        if ($str instanceof Expression) {
-            $values = $str->values();
-            $str = $str->sql();
+        $this->_raw = true;
+        if (!($str instanceof Expression)) {
+            $str = new Expression($str, $values);
         }
-        return $this->_execute($str, $values);
+        $this->_query = $str;
+        return $this;
     }
 
     private function _buildWhere()
@@ -523,7 +523,12 @@ class ORM
 
     private function _fetch()
     {
-        list($sqlStr, $values) = $this->_buildSelectSql();
+        if ($this->_raw) {
+            $sqlStr = $this->_query->sql();
+            $values = $this->_query->values();
+        } else {
+            list($sqlStr, $values) = $this->_buildSelectSql();
+        }
 
         $stmt = self::_execute($sqlStr, $values);
 
@@ -536,6 +541,14 @@ class ORM
             }
         }
         return $ret ?: array();
+    }
+
+    public function execute()
+    {
+        if ($this->_raw) {
+            return self::_execute($this->_query->sql(), $this->_query->values());
+        }
+        return false;
     }
 
     private static function _execute($sqlStr, $values)
@@ -650,7 +663,7 @@ class DataWrapper implements ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        return $this;
+        return $this->set($offset, $value);
     }
 
     public function offsetUnset($offset)
@@ -666,6 +679,16 @@ class DataWrapper implements ArrayAccess
     public function _isset($name)
     {
         return isset($this->_info[$name]);
+    }
+
+    public function set($name, $value)
+    {
+        $this->_info[$name] = $value;
+    }
+
+    public function __set($name, $value)
+    {
+        return $this->set($name, $value);
     }
 
     public function toArray()
