@@ -86,13 +86,13 @@ class Model
 
     public function filter($data)
     {
-        if (!isset(static::$fileds)) {
+        if (!isset(static::$fields)) {
             return $data;
         }
         $ret = array();
-        foreach (static::$fileds as $field => $value) {
+        foreach (static::$fields as $field => $value) {
             if (isset($data[$field])) {
-                $ret[$field] = $value;
+                $ret[$field] = $data[$field];
             }
         }
         return $ret;
