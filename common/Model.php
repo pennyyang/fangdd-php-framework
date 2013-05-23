@@ -100,6 +100,14 @@ class Model
 
     public function valid($data)
     {
+        if(!isset(static::$fields)){
+            return true;
+        }
+        
+        foreach(static::$fields as $name => $value){
+            
+        }
+        
         return true;
     }
 }

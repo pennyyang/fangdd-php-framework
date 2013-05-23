@@ -16,6 +16,10 @@ class Validator {
     public function setMsg($msg) {
         self::$msg[] = $msg;
     }
+    
+    public function volid(){
+        
+    }
 
     /**
      * 是否数字
@@ -58,10 +62,31 @@ class Validator {
     public function in($value, $rules, $msg) {
         return in_array($value, $rules) ? true : self::$msg[] = $msg;
     }
-    
-    public function email($value, $msg){
-        $rules = '';
+
+    public function email($value, $msg) {
+        $rules = "/\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/";
+        return preg_match($rules, $value) ? true : self::$msg[] = $msg;
     }
+
+    public function mobile($value, $msg) {
+        $rules = "/^1([358]\d|4[57])\d{8}$/";
+        return preg_match($rules, $value) ? true : self::$msg[] = $msg;
+    }
+
+    public function string($value, $msg) {
+        return is_string($value) ? true : self::$msg[] = $msg;
+    }
+
+    public function datetime($value, $msg) {
+        $rules = "/[\d]{4}-[\d]{1,2}-[\d]{1,2}\s[\d]{1,2}:[\d]{1,2}:[\d]{1,2}/";
+        return preg_match($rules, $value) ? true : self::$msg[] = $msg;
+    }
+
+    public function date($value, $msg) {
+        $rules = "/[\d]{4}-[\d]{1,2}-[\d]{1,2}/";
+        return preg_match($rules, $value) ? true : self::$msg[] = $msg;
+    }
+    
 
 }
 
