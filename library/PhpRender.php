@@ -1,6 +1,6 @@
 <?php
 /**
-* php 视图渲染类
+* PHP 视图渲染类
 */
 class PhpRender
 {

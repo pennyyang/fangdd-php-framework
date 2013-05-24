@@ -1,6 +1,7 @@
 <?php
-
 /**
+ * 路由类
+ * 
  * 下一步可以实现根据返回值自动渲染相应的模版文件
  * 模版文件位置：/view/template/controller/action.phtml
  *
@@ -8,7 +9,6 @@
  * rule()
  * rules()
  */
-
 class Router {
 
     private $url;
@@ -18,6 +18,8 @@ class Router {
     }
 
     /**
+     * 分发函数
+     * 调用此函数时执行 action 方法
      * default indexController::indexAction()
      */
     public function dispath() {
