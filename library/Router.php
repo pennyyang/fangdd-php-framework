@@ -27,7 +27,8 @@ class Router {
     public function dispath()
     {
         foreach ($this->_rules as $rule) {
-            if (preg_match('/'.$rule['regex'].'/', $this->_url, $matches)) {
+            $regex = str_replace('/', '\/', $rule['regex']);
+            if (preg_match('/^'.$regex.'$/', $this->_url, $matches)) {
                 
                 // 将参量压入 $_GET
                 foreach ($matches as $key => $value) {
@@ -40,10 +41,11 @@ class Router {
                 }
 
                 $result = $this->_execute($rule['contr'], $rule['act']);
+                $rule_exec = 1;
                 break;
             }
         }
-        if (!isset($result)) {
+        if (!isset($rule_exec)) {
             // 默认的路由规则 /controller/action
             $arr = explode('/', $this->_url);
             unset($arr[0]);

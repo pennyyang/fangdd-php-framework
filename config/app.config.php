@@ -6,4 +6,7 @@
 return array(
     'application_name' => '',
     'debug' => true,
+    'router' => array(
+        array('GET', '/test/[:id]', array('test', 'index'))
+    )
 );

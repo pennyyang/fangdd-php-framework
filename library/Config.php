@@ -11,7 +11,7 @@ class Config
      * 初始化配置
      * @param string $root 配置文件根目录
      */
-    public static function init(string $root) {
+    public static function init($root) {
         self::$_data = array_merge(
             include $root.'app.config.php',
             include $root.ENV.'.config.php'
