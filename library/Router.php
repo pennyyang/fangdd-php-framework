@@ -25,13 +25,16 @@ class Router {
     {
         foreach ($this->_rules as $rule) {
             $regex = str_replace('/', '\/', $rule['regex']);
-            if (preg_match('/^'.$regex.'$/', $this->_url, $matches)) {
+            if ($_SERVER['REQUEST_METHOD'] == $rule['method'] && preg_match('/^'.$regex.'$/', $this->_url, $matches)) {
                 
                 // 将参量压入 $_GET
                 foreach ($matches as $key => $value) {
                     if ($key) {
                         $name = $rule['names'][$key-1];
                         $_GET[$name] = $value;
+                        if ($rule['method'] == 'POST') {
+                            $_POST[$name] = $value;
+                        }
                     }
                 }
 
