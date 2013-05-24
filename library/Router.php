@@ -87,6 +87,5 @@ class Router {
             'act' => $ca[1],
         );
     }
-
 }
 
