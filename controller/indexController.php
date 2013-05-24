@@ -9,4 +9,9 @@ class indexController extends Controller
     {
         return array();
     }
+
+    public function testAction()
+    {
+        echo "a";
+    }
 }
