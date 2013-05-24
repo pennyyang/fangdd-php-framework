@@ -1,7 +1,6 @@
 <?php
-
 /**
-* Model
+* 模型类的基类
 * 对应一张表
 */
 class Model
