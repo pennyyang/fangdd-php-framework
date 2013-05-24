@@ -81,6 +81,7 @@ class Router {
         $regex = preg_replace('/\[:[a-zA-Z][a-zA-Z\d_]*\]/', '([^/]+)', $rule);
         preg_match_all('/\[:([a-zA-Z][a-zA-Z\d_]*)\]/', $rule, $matches);
         $this->_rules[] = array(
+            'method' => $method,
             'regex' => $regex, 
             'names' => $matches[1],
             'contr' => $ca[0],
