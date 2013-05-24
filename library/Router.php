@@ -31,9 +31,7 @@ class Router {
                 foreach ($matches as $key => $value) {
                     if ($key) {
                         $name = $rule['names'][$key-1];
-                        if (!isset($_GET[$name])) {
-                            $_GET[$name] = $value;
-                        }
+                        $_GET[$name] = $value;
                     }
                 }
 
@@ -71,9 +69,9 @@ class Router {
     /**
      * 新增一条路由规则
      * $router->rule('GET', '/user/[:id]', array('user', 'view'))
-     * 第一个参数是HTTP方法
-     * 第二个参数是URL规则，其中方括号冒号开头代指一个参数，放到 $_GET 数组中
-     * 第三个参数是一个数组 array('控制器', 'Action')
+     * @param HTTP方法 'GET'|'POST'|'PUT'|'DELETE'
+     * @param URL规则，如 /user/[:id]，其中方括号冒号开头代指一个参数，放到 $_GET 数组中
+     * @param 数组 array('控制器', 'Action')
      */
     public function rule($method, $rule, $ca)
     {
