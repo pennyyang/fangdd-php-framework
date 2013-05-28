@@ -1,10 +1,9 @@
 fangdd-php-framework
 ====================
 
-为积分赛所做的小框架。
-hh
+为 **迪哥杯** 积分赛所做的小框架。
 
-关于这个小框架，我觉得可以这么来：
+**特点**
 
 1. MVC（简单的模型、控制器、和渲染引擎（可以布局））
 1. 实现路由（ Router , 杨萍）和数据库（ ORM , 王霄池），以及表单验证（ Validator , 谢康旺）
@@ -33,7 +32,7 @@ hh
 - 连贯接口(FluentInterface) `$model->where->find()`
 - 工厂方法(Factory Method) `$model->forTabel('user')`
 
-特征
+特征展示
 -----------
 
 **结构**
@@ -104,3 +103,29 @@ $this->model
     ->conditions(get())
     ->where(...)
 ```
+
+**路由**
+
+路由可以设置规则
+
+```php
+$router = new Router();
+$router->rule('/latest', array('article', 'latest'));
+$router->rule('/article/[:id]', array('article', 'view'));
+$router->rule('GET', '/article/[:id]/edit', array('article', 'edit'));
+$router->rule('POST', '/article/[:id]/edit', array('article', 'editSave'));
+$router->rule('*', array('page404', 'index'));
+$router->dispatch();
+```
+
+如果不设置规则，则路由会应用默认的规则。
+
+```php
+$router = new Router();
+$router->rule('/[:controller]/[:action]', array('{$controller}', '{$action}'));
+$router->rule('*', array('page404', 'index'));
+$router->dispatch();
+```
+
+**验证**
+
