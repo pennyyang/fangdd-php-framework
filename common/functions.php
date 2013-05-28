@@ -18,3 +18,4 @@ function _post($key = null)
     }
     return isset($_POST[$key]) ? trim($_POST[$key]) : null;
 }
+

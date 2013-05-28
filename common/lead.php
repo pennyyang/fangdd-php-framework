@@ -36,3 +36,4 @@ if ($view) {
     $view->layout('master');
     $view->render();
 }
+
