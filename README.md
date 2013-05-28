@@ -122,10 +122,10 @@ $router->dispatch();
 
 ```php
 $router = new Router();
-$router->rule('/[:controller]/[:action]', array('{$controller}', '{$action}'));
-$router->rule('*', array('page404', 'index'));
+// $router->rule('/[:controller]/[:action]', array('{$controller}', '{$action}'));
+// $router->rule('*', array('page404', 'index'));
 $router->dispatch();
 ```
 
 **验证**
-
+    
