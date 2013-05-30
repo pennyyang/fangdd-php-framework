@@ -1,11 +1,12 @@
 <?php
 
-class test {
+class testController extends Controller
+{
 
-    function indexAction() {
-        echo 'hello qorld';
+    function indexAction() 
+    {
+        echo _get('id');
+        // return false;
     }
-
 }
 
-?>
