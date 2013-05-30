@@ -88,7 +88,7 @@ class ORM
         return self::$_db;
     }
 
-    public static function forTable($table, $pkey = null)
+    public static function forTable($table = null, $pkey = null)
     {
         if ($pkey === null) {
             $pkey = 'id';
